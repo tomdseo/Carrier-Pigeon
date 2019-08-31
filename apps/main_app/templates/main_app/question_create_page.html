@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Question</title>
+     {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'main_app/css/master.css' %}">
+</head>
+<body id="question-page">
+<section class="pt-0 mb-3">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-6 text-center">
+            <h2><b>Ask</b> what you want to know.</h2>
+            <p>Your Carrier Pigeon will come back. It will carry back the answer to your question when another person replies.</p>
+          </div>
+        </div>
+      </div>
+</section>
+  <form action="/action_question_create" method="post" class="text-center">
+      <div class="typewriter d-inline-block">
+        <h4 class="d-inline-block display-4 text-center mb-3">To the Locals of {{ city_string }},</h4>
+      </div>
+        {% csrf_token %}
+        <textarea name="question" placeholder="What is the best 'Hole In The Wall' Cafe around Downtown?" class="d-block mx-auto box-shadow-strength-0" required></textarea>
+        <input name="title" type="text" placeholder="Cafe Suggestions" class="d-block mx-auto mt-3 box-shadow-strength-0 width-20percent" required>
+        <input value="{{ city_string }}" name="city" type="hidden">
+        <input value="{{ user.username }}" name="creator" type="hidden">
+        <button class="mt-5 btn btn-dark btn-lg width-20percent">Submit</button>
+    </form>
+</body>
+</html>

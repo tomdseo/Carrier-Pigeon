@@ -1,0 +1,6 @@
+const config = {
+    MAPKEY: "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijg4VTJXUVVZNE4ifQ.eyJpc3MiOiJNOEJQNEJBNkhDIiwiaWF0IjoxNTY2ODc3NTEzLCJleHAiOjE2MzAwMzU5MTN9.uFVs5fYQF75FB9kfviGLKBMfvJOCBAUHtdHbV7-YbmB5e1BHlSv-fjZHwN1D9GixDjlbo1a-0HEIjvrRLRdC8A"
+}
+
+module.exports=config;
+

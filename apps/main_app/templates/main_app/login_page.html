@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+   {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'main_app/css/master.css' %}">
+</head>
+<h3 class="crazy-font big-font mb-5">Welcome</h3>
+<body id="login-page" class="text-center" cz-shortcut-listen="true">
+    <form class="mx-auto width-20percent" action="action_login" method = "POST" data-toggle="validator" role="form">
+        {% csrf_token %}
+        <label for="inputEmail" class="sr-only"></label>
+        <input type="email" id="inputEmail" class="mb-3 form-control" placeholder="Email Address" name='email' required>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" id="inputPassword" class="mb-3 form-control" placeholder="Password" name='password' required>
+        <button class="btn btn-md btn-dark btn-block" type="submit">Login</button>
+    </form>
+         <!-- Validations -->
+        <div class = "errors ilb mt-3">
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <p class="lead color-red" {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+   <p class="mt-4 text-muted"><a class="color-black" href="register">Don't Have an Account? Create One.</a></p>
+</body>
+</html>
+

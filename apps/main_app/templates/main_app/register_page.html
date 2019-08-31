@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+     {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'main_app/css/master.css' %}">
+</head>
+<body id="register-page">
+    <div class="py-1 text-center">
+    <img src="{% static 'main_app/icons/carrier_pigeon.png' %}" class="mb-5 margin-left-80px" alt="Logo" width="102" height="102">
+    <h2>Create an Account</h2>
+    <p class="lead">Get to Own a Pigeon!</p>
+    </div>
+    <div class="width-50percent mx-auto">
+      <form action="action_register" method="POST">
+      {% csrf_token %}
+        <div class="mb-3">
+            <label>Your First Name</label>
+            <input name="first_name" type="text" class="form-control" placeholder="Johnny" required>
+            <div class="invalid-feedback" style="width: 100%;">
+              Your First Name is required.
+            </div>
+        </div>
+        <div class="mb-3">
+            <label>Your Last Name</label>
+            <input name="last_name" type="text" class="form-control" placeholder="Dodo" required>
+            <div class="invalid-feedback" style="width: 100%;">
+              Your Last Name is required.
+            </div>
+        </div>
+        <div class="mb-3">
+              <label>Your Email</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">📬</span>
+                </div>
+                <input name="email" type="text" class="form-control" placeholder="johndoe@example.com" required>
+                <div class="invalid-feedback" style="width: 100%;">
+                  Your Email is required.
+                </div>
+              </div>
+        </div>
+        <div class="mb-3">
+              <label>Your Username</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">🤡</span>
+                </div>
+                <input name="username" type="text" class="form-control" id="username" placeholder="johnnydodo" required>
+                <div class="invalid-feedback" style="width: 100%;">
+                  Your Username is required.
+                </div>
+              </div>
+        </div>
+        <div class="mb-3">
+              <label>Where You Live</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">📍</span>
+                </div>
+                 <select class="form-control" name="city" required>
+                     <option value="" selected disabled><p class="text-muted">Pigeon City</p></option>
+                    {% for city in cities %}
+                        <option value="{{city.city}}">{{city.city}}</option>
+                    {% endfor %}
+                </select>
+                <div class="invalid-feedback" style="width: 100%;">
+                  Where You Live is required.
+                </div>
+              </div>
+        </div>
+        <div class="mb-3">
+              <label>Password</label>
+              <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">🔒</span>
+              </div>
+              <input name="password" type="password" class="form-control" placeholder="**********" required>
+              <div class="invalid-feedback">
+                Your Password is required.
+              </div>
+        </div>
+        <div class="mb-4 mt-3">
+              <label>Confirm Password</label>
+              <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">🔒</span>
+              </div>
+              <input name="password_confirm" type="password" class="form-control" placeholder="**********" required>
+              <div class="invalid-feedback">
+                Your Confirm Password is required.
+              </div>
+              </div>
+        </div>
+        <div class="mt-4">
+            <button class="btn btn-lg btn-dark btn-block mb-2" type="submit" value="Register">Register</button>
+            <a href="/" class="btn btn-lg btn-dark btn-block">Cancel</a>
+        </div>
+      </form>
+          <div class = "errors ilb mt-3">
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <p class="lead color-red" {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

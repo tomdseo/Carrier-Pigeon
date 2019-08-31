@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+     {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'main_app/css/master.css' %}">
+    <link rel="stylesheet" href="{% static 'main_app/css/map.css' %}">
+    <link rel="stylesheet" href="{% static 'main_app/css/waves.css' %}">
+    <script type="text/javascript" src="{% static 'main_app/js/config.js '%}"></script>
+    <script type="text/javascript" src="{% static 'main_app/js/laser.js' %}"></script>
+
+
+    <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+
+</head>
+<body>
+{#    NAVBAR ---------------------------------------------------------------------------------------------- #}
+    <nav class="navbar navbar-expand-lg fixed-top shadow navbar-light bg-light">
+        <div class="container-fluid">
+          <div class="d-flex align-items-center"><a class="navbar-brand">
+              <img class="d-inline-block" src="{% static 'main_app/icons/carrier_pigeon.png' %}" alt="Logo" width="52" height="52"><h3 class="ml-3 d-inline-block py-2">Carrier Pigeon</h3></a>
+          </div>
+          <!-- Navbar Collapse -->
+          <div id="navbarCollapse" class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item position-static"><a class="navbar-text mr-3"><strong>{{ user.first_name }}</strong>, Your Location is <strong>📍 {{ user.city.city }}</strong></a></li>
+              <li class="nav-item position-static"><a href="#" class="nav-link">Settings</a>
+              <li class="nav-item mt-3 mt-lg-0 ml-lg-3 d-lg-none d-xl-inline-block"><a href="/action_logout" class="btn btn-danger">Logout</a></li>
+            </ul>
+          </div>
+        </div>
+    </nav>
+
+{#    MAP ------------------------------------------------------------------------------------------------ #}
+    <div class="parallax-background">
+        <div id="map"></div>
+
+        <script>
+            mapkit.init({
+                authorizationCallback: function(done) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "/services/jwt");
+                    xhr.addEventListener("load", function() {
+                        {#2 Year Long Token#}
+                        done(config.MAPKEY);
+                    });
+                    xhr.send();
+                }
+            });
+
+
+            // Landmarks data
+            var sanFranciscoLandmarks = [
+                { coordinate: new mapkit.Coordinate(34.052235, -118.243683), title: "Los Angeles", info: "Population: 4 Million", url: "/question/Los_Angeles" },
+                { coordinate: new mapkit.Coordinate(33.6846, -117.8265), title: "Irvine", info: "Population: 0.3 Million", url: "/question/Irvine" },
+                { coordinate: new mapkit.Coordinate(32.7346, -117.1491), title: "San Diego", info: "Population: 1.4 Million", url: "/question/San_Diego" },
+                { coordinate: new mapkit.Coordinate(34.4208, -119.6982), title: "Santa Barbara", info: "Population: .1 Million", url: "/question/Santa_Barbara" },
+                { coordinate: new mapkit.Coordinate(37.7749, -122.4194), title: "San Francisco", info: "Population: 1 Million", url: "/question/San_Francisco" },
+                { coordinate: new mapkit.Coordinate(37.3382, -121.8863), title: "San Jose", info: "Population: 1 Million", url: "/question/San_Jose" },
+                { coordinate: new mapkit.Coordinate(40.7128, -74.0060), title: "New York", info: "Population: 9 Million", url: "/question/New_York" },
+                { coordinate: new mapkit.Coordinate(47.6062, -122.3321), title: "Seattle", info: "Population: 9 Million", url: "/question/Seattle" },
+                { coordinate: new mapkit.Coordinate(39.7392, -104.9903), title: "Denver", info: "Population: 0.7 Million", url: "/question/Denver" },
+                { coordinate: new mapkit.Coordinate(41.8781, -87.6298), title: "Chicago", info: "Population: 2.8 Million", url: "/question/Chicago" },
+                { coordinate: new mapkit.Coordinate(25.7617, -80.1918), title: "Miami", info: "Population: 0.5 Million", url: "/question/Miami" },
+                { coordinate: new mapkit.Coordinate(42.3601, -71.0589), title: "Boston", info: "Population: 0.7 Million", url: "/question/Boston" },
+                { coordinate: new mapkit.Coordinate(30.2672, -97.7431), title: "Austin", info: "Population: 1 Million", url: "/question/Austin" },
+                { coordinate: new mapkit.Coordinate(43.6532, -79.3832), title: "Toronto", info: "Population: 2.9 Million", url: "/question/Toronto" },
+                { coordinate: new mapkit.Coordinate(45.5017, -73.5673), title: "Montreal", info: "Population: 1.8 Million", url: "/question/Montreal" },
+            ];
+
+            // Landmark annotation callout delegate
+            var CALLOUT_OFFSET = new DOMPoint(-148, -78);
+            var landmarkAnnotationCallout = {
+                calloutElementForAnnotation: function(annotation) {
+                    return calloutForLandmarkAnnotation(annotation);
+                },
+
+                calloutAnchorOffsetForAnnotation: function(annotation, element) {
+                    return CALLOUT_OFFSET;
+                },
+
+                calloutAppearanceAnimationForAnnotation: function(annotation) {
+                    return "scale-and-fadein .4s 0 1 normal cubic-bezier(0.4, 0, 0, 1.5)";
+                }
+            };
+
+            // Landmarks annotations
+            var annotations = sanFranciscoLandmarks.map(function(landmark) {
+                var annotation = new mapkit.MarkerAnnotation(landmark.coordinate, {
+                    callout: landmarkAnnotationCallout,
+                    color: "#FF0000",
+                });
+                annotation.landmark = landmark;
+                return annotation;
+            });
+
+            var map = new mapkit.Map("map");
+            map.showItems(annotations);
+
+            // Landmark annotation custom callout
+            function calloutForLandmarkAnnotation(annotation) {
+                var div = document.createElement("div");
+                div.className = "landmark";
+
+                var title = div.appendChild(document.createElement("h1"));
+                title.textContent = annotation.landmark.title;
+
+                var section = div.appendChild(document.createElement("section"));
+
+                var phone = section.appendChild(document.createElement("p"));
+                phone.className = "info";
+                phone.textContent = annotation.landmark.info;
+
+                var link = section.appendChild(document.createElement("p"));
+                link.className = "homepage";
+                var a = link.appendChild(document.createElement("a"));
+                a.href = annotation.landmark.url;
+                a.textContent = "Send Carrier Pigeon";
+
+                return div;
+            }
+        </script>
+    </div>
+{#    QUESTIONS ------------------------------------------------------------------------------------------ #}
+    <div class="parallax-content">
+        <div class="bg-white box-shadow pt-4 pb-2">
+            <div class="row">
+              <div class="col-md-4">
+                <h5><span class="d-inline-block bg-success text-white px-2 py-1">#1</span> Scout the Area</h5>
+                <p class="text-muted pb-3">Drag and zoom in the map.</p>
+                <hr>
+              </div>
+              <div class="col-md-4">
+                <h5><span class="d-inline-block bg-warning text-white px-2 py-1">#2</span> Decide on a Location</h5>
+                <p class="text-muted pb-3">Click on one of the pins.</p>
+                <hr>
+              </div>
+                <div class="col-md-4">
+                <h5><span class="d-inline-block bg-danger text-white px-2 py-1">#3</span> Fly to the Location</h5>
+                <p class="text-muted pb-3">Select, "Send Carrier Pigeon"</p>
+                <hr>
+              </div>
+            </div>
+        </div>
+
+        {% if notanswered_nonuser_city_questions or user_questions.count > 0 %}
+            {% if notanswered_nonuser_city_questions %}
+                <section class="mb-5">
+                        <div class="container text-center">
+                            <div class="pb-lg-4">
+                                <h2 class="mb-3">Carrier Pigeons at Your Location</h2>
+                            </div>
+                        </div>
+                         <table class="table">
+                            <thead class="bg-danger color-white">
+                                <tr>
+                                    <th scope="col">Title</th>
+                                    <th scope="col">Sender</th>
+                                    <th scope="col">Date Sent</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    {% for questionObj in notanswered_nonuser_city_questions %}
+                                        <tr>
+                                            <td><a href="/question/view/{{ questionObj.id }}">{{ questionObj.title }}</a></td>
+                                            <td>{{ questionObj.creator.username }}</td>
+                                            <td>{{ questionObj.created_at }}</td>
+                                        </tr>
+                                    {% endfor %}
+                            </tbody>
+                        </table>
+                </section>
+            {%  else %}
+                <section class="mb-5">
+                    <div class="header">
+                    <!--Content before waves-->
+                        <div class="inner-header flex">
+                            <h3 class="wave-font">No Pigeons Sent To Your Location</h3>
+                        </div>
+                        <div>
+                            <p class="font-size-small wave-cr">Animation made by Daniel Österman</p>
+                        </div>
+                    <!--Waves Container-->
+                    <div>
+                        <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                        viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+                        <defs>
+                        <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+                        </defs>
+                        <g class="parallax">
+                        <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7" />
+                        <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)" />
+                        <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)" />
+                        <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff" />
+                        </g>
+                        </svg>
+                    </div>
+                    <!--Waves end-->
+                    </div>
+                    <!--Header ends-->
+                </section>
+            {% endif %}
+
+            {% if user_questions.count > 0 %}
+                <section class="mb-5">
+                     <table class="table">
+                        <div class="container text-center">
+                            <div class="pb-lg-4">
+                                <h2 class="mb-3">Carrier Pigeons You Sent</h2>
+                            </div>
+                        </div>
+                        <thead class="thead-dark">
+                            <tr>
+                              <th scope="col">Title</th>
+                                <th scope="col">Came Back</th>
+                                <th scope="col">City</th>
+                                <th scope="col">Date Sent</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                                {% for questionObj in user_questions %}
+                                    {% if questionObj.answer %}
+                                    <tr>
+                                        <td><a href="/question/view/{{ questionObj.id }}">{{ questionObj.title }}</a></td>
+                                        <td><h4>👍Yes</h4></td>
+                                        <td>{{ questionObj.city.city }}</td>
+                                        <td>{{ questionObj.created_at }}</td>
+                                        <td><a href="/action_question_delete/{{ questionObj.id }}">Forget</a></td>
+                                    </tr>
+                                    {%  else %}
+                                    <tr>
+                                        <td><a href="/question/view/{{ questionObj.id }}">{{ questionObj.title }}</a></td>
+                                        <td><h4>👎No</h4></td>
+                                        <td>{{ questionObj.city.city }}</td>
+                                        <td>{{ questionObj.created_at }}</td>
+                                        <td><a href="/action_question_delete/{{ questionObj.id }}">Forget</a></td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                        </tbody>
+                    </table>
+                </section>
+            {% else %}
+                <section class="mb-5">
+                    <div class="header">
+                    <!--Content before waves-->
+                        <div class="inner-header flex">
+                            <h3 class="wave-font">No Pigeons You Sent</h3>
+                        </div>
+                        <div>
+                            <p class="font-size-small wave-cr">Animation made by Daniel Österman</p>
+                        </div>
+                    <!--Waves Container-->
+                    <div>
+                        <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                        viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+                        <defs>
+                        <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+                        </defs>
+                        <g class="parallax">
+                        <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7" />
+                        <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)" />
+                        <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)" />
+                        <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff" />
+                        </g>
+                        </svg>
+                    </div>
+                    <!--Waves end-->
+                    </div>
+                    <!--Header ends-->
+                </section>
+            {% endif %}
+    {% else %}
+            <section class="mb-5">
+                <div class="header">
+                <!--Content before waves-->
+                    <div class="inner-header flex">
+                        <h3 class="wave-font">Start By Sending a Carrier Pigeon</h3>
+                    </div>
+                    <div>
+                        <p class="font-size-small wave-cr">Animation made by Daniel Österman</p>
+                    </div>
+                <!--Waves Container-->
+                <div>
+                    <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                    viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+                    <defs>
+                    <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+                    </defs>
+                    <g class="parallax">
+                    <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7" />
+                    <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)" />
+                    <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)" />
+                    <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff" />
+                    </g>
+                    </svg>
+                </div>
+                <!--Waves end-->
+                </div>
+                <!--Header ends-->
+                <!--Content starts-->
+                <!--Content ends-->
+            </section>
+    {% endif %}
+    </div>
+
+</body>
+</html>
